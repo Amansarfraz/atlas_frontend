@@ -14,7 +14,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<User> users = [];
 
   final String apiUrl =
-      "http://<YOUR_BACKEND_IP>:8000/users"; // Replace with your backend URL
+      "http://192.168.100.8:8000/users"; // Replace with your backend URL
 
   @override
   void initState() {
