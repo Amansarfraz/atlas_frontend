@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import '../models/user.dart';
+import '../services/api_service.dart';
 import 'add_user_screen.dart';
 import 'update_user_screen.dart';
 
@@ -13,9 +12,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<User> users = [];
 
-  final String apiUrl =
-      "http://192.168.100.8:8000/users"; // Replace with your backend URL
-
   @override
   void initState() {
     super.initState();
@@ -23,20 +19,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> fetchUsers() async {
-    final response = await http.get(Uri.parse(apiUrl));
-    if (response.statusCode == 200) {
-      List data = jsonDecode(response.body);
-      setState(() {
-        users = data.map((json) => User.fromJson(json)).toList();
-      });
-    }
+    var data = await ApiService.getUsers();
+    setState(() {
+      users = data.map((json) => User.fromJson(json)).toList();
+    });
   }
 
   Future<void> deleteUser(String userId) async {
-    final response = await http.delete(Uri.parse("$apiUrl/$userId"));
-    if (response.statusCode == 200) {
-      fetchUsers();
-    }
+    bool success = await ApiService.deleteUser(userId);
+    if (success) fetchUsers();
   }
 
   @override

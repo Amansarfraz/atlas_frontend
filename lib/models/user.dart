@@ -15,14 +15,16 @@ class User {
     required this.age,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) => User(
-    userId: json['user_id'],
-    name: json['name'],
-    fatherName: json['father_name'],
-    city: json['city'],
-    country: json['country'],
-    age: json['age'],
-  );
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      userId: json['user_id'] ?? '',
+      name: json['name'] ?? '',
+      fatherName: json['father_name'] ?? '',
+      city: json['city'] ?? '',
+      country: json['country'] ?? '',
+      age: json['age'] ?? 0,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     'user_id': userId,

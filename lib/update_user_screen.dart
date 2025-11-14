@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import '../models/user.dart';
+import '../services/api_service.dart';
 
 class UpdateUserScreen extends StatefulWidget {
   final User user;
-
   UpdateUserScreen({required this.user});
 
   @override
@@ -31,9 +29,6 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
   ];
   final List<String> countries = ["Pakistan", "India", "USA", "UK", "UAE"];
 
-  final String apiUrl =
-      "http://<YOUR_BACKEND_IP>:8000/users"; // Replace with your backend URL
-
   @override
   void initState() {
     super.initState();
@@ -55,19 +50,16 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
         age: int.parse(_ageController.text),
       );
 
-      final response = await http.put(
-        Uri.parse("$apiUrl/${widget.user.userId}"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(updatedUser.toJson()),
+      bool success = await ApiService.updateUser(
+        widget.user.userId,
+        updatedUser.toJson(),
       );
-
-      if (response.statusCode == 200) {
+      if (success)
         Navigator.pop(context);
-      } else {
+      else
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error updating user')));
-      }
     }
   }
 
@@ -84,45 +76,36 @@ class _UpdateUserScreenState extends State<UpdateUserScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(labelText: "Name"),
-                validator: (value) => value!.isEmpty ? "Enter Name" : null,
+                validator: (v) => v!.isEmpty ? "Enter Name" : null,
               ),
               TextFormField(
                 controller: _fatherNameController,
                 decoration: InputDecoration(labelText: "Father Name"),
-                validator: (value) =>
-                    value!.isEmpty ? "Enter Father Name" : null,
+                validator: (v) => v!.isEmpty ? "Enter Father Name" : null,
               ),
               DropdownButtonFormField<String>(
                 value: _selectedCity,
                 items: cities
-                    .map(
-                      (city) =>
-                          DropdownMenuItem(value: city, child: Text(city)),
-                    )
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                     .toList(),
-                onChanged: (value) => setState(() => _selectedCity = value),
+                onChanged: (v) => setState(() => _selectedCity = v),
                 decoration: InputDecoration(labelText: "City"),
-                validator: (value) => value == null ? "Select City" : null,
+                validator: (v) => v == null ? "Select City" : null,
               ),
               DropdownButtonFormField<String>(
                 value: _selectedCountry,
                 items: countries
-                    .map(
-                      (country) => DropdownMenuItem(
-                        value: country,
-                        child: Text(country),
-                      ),
-                    )
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                     .toList(),
-                onChanged: (value) => setState(() => _selectedCountry = value),
+                onChanged: (v) => setState(() => _selectedCountry = v),
                 decoration: InputDecoration(labelText: "Country"),
-                validator: (value) => value == null ? "Select Country" : null,
+                validator: (v) => v == null ? "Select Country" : null,
               ),
               TextFormField(
                 controller: _ageController,
                 decoration: InputDecoration(labelText: "Age"),
                 keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? "Enter Age" : null,
+                validator: (v) => v!.isEmpty ? "Enter Age" : null,
               ),
               SizedBox(height: 20),
               ElevatedButton(onPressed: updateUser, child: Text("Update User")),
